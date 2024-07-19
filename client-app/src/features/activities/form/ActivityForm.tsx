@@ -1,24 +1,23 @@
 import React, { ChangeEvent, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
-import { Activity } from "../../../app/models/activity";
+import { useStore } from "../../../app/stores/store";
+import { observer } from "mobx-react-lite";
 
-interface Props {
-  activity: Activity | undefined;
-  closeForm: () => void;
-  createOrEdit: (activity: Activity) => void;
-  submitting: boolean;
-}
+export default observer(function ActivityForm() {
+  const { activityStore } = useStore();
+  const {
+    selectedActivity,
+    closeForm,
+    createActivity,
+    updateActivity,
+    loading,
+  } = activityStore;
 
-export default function ActivityForm({
-  activity: selectedActivity,
-  closeForm,
-  createOrEdit,
-  submitting,
-}: Props) {
   const initialState = selectedActivity ?? {
     id: "",
     title: "",
     category: "",
+    description: "",
     date: "",
     city: "",
     venue: "",
@@ -27,7 +26,7 @@ export default function ActivityForm({
   const [activity, setActivity] = useState(initialState);
 
   function handleSubmit() {
-    createOrEdit(activity);
+    activity.id ? updateActivity(activity) : createActivity(activity);
   }
 
   function handleInputChange(
@@ -48,36 +47,36 @@ export default function ActivityForm({
         <Form.TextArea
           placeholder="Description"
           value={activity.description}
-          name="Description"
+          name="description"
           onChange={handleInputChange}
         />
         <Form.Input
           placeholder="Category"
           value={activity.category}
-          name="Category"
+          name="category"
           onChange={handleInputChange}
         />
         <Form.Input
           type="date"
           placeholder="Date"
           value={activity.date}
-          name="Date"
+          name="date"
           onChange={handleInputChange}
         />
         <Form.Input
           placeholder="City"
           value={activity.city}
-          name="City"
+          name="city"
           onChange={handleInputChange}
         />
         <Form.Input
           placeholder="Venue"
           value={activity.venue}
-          name="Venue"
+          name="venue"
           onChange={handleInputChange}
         />
         <Button
-          loading={submitting}
+          loading={loading}
           floated="right"
           positive
           type="submit"
@@ -92,4 +91,4 @@ export default function ActivityForm({
       </Form>
     </Segment>
   );
-}
+});
