@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.min.css";
 import "./app/layout/styles.css";
 import { store, StoreContext } from "./app/stores/store";
 import { BrowserRouter } from "react-router-dom";
+import "react-datepicker/dist/react-datepicker.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StoreContext.Provider value={store}>

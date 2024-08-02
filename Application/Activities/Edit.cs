@@ -3,7 +3,8 @@ using AutoMapper;
 using Domain;
 using FluentValidation;
 using MediatR;
-using Persistence;
+using Microsoft.Extensions.Logging;
+using Persistence; 
 
 namespace Application.Activities
 {
@@ -28,24 +29,42 @@ namespace Application.Activities
             private readonly DataContext _context;
             private readonly IMapper _mapper;
 
+
             public Handler(DataContext context,IMapper mapper)
             {
                 _context = context;
                 _mapper = mapper;
             }
+
+ 
+
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var activity = await _context.Activities.FindAsync(request.Activity.Id);
 
-                if (activity == null) return null;
+                if(activity == null){
+                    return null;
+                }
+                
+                _mapper.Map(request.Activity, activity);
 
-                //activity.Title = request.Activity.Title ?? activity.Titl
-                //e;
-                _mapper.Map(request.Activity, activity);    
+                try
+                {
+                    var result = await _context.SaveChangesAsync() > 0;
+                    if (!result)
+                    {
 
-                var result =  await _context.SaveChangesAsync() > 0  ;
+                        return Result<Unit>.Failure("Failed to update activity");
+                    }
 
-                if (!result) return Result<Unit>.Failure($"Failed to update {result}"); 
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+                
+                
 
                 return Result<Unit>.Success(Unit.Value);
             }
